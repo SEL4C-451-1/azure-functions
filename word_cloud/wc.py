@@ -1,17 +1,46 @@
-import numpy as np
-from PIL import Image
+#!/usr/bin/env python
+"""
+Masked wordcloud
+================
+
+Using a mask you can generate wordclouds in arbitrary shapes.
+"""
+
 from os import path
-from wordcloud import WordCloud
+from PIL import Image
+import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+from wordcloud import WordCloud, STOPWORDS
+
+# get data directory (using getcwd() is needed to support running example in generated IPython notebook)
 d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-mask = np.array(Image.open(path.join(d, "sel4c_logo_nbg.png")))
+
+# Read the whole text.
 text = open(path.join(d, 'text.txt')).read()
 
-wc = WordCloud(mask=mask, margin=10, random_state=1).generate(text)
-plt.imshow(wc)
-wc.to_file("result.png")
+# read the mask image
+# taken from
+# http://www.stencilry.org/stencils/movies/alice%20in%20wonderland/255fk.jpg
+alice_mask = np.array(Image.open(path.join(d, "logo.png")))
+
+stopwords = set(STOPWORDS)
+stopwords.add("said")
+
+wc = WordCloud(background_color="white", max_words=2000, mask=alice_mask,
+               stopwords=stopwords, contour_width=1, contour_color='steelblue', colormap='winter', height=300, width=100)
+
+# generate word cloud
+wc.generate(text)
+
+# store to file
+wc.to_file(path.join(d, "result.png"))
+
+# show
+plt.imshow(wc, interpolation='bilinear')
 plt.axis("off")
 plt.figure()
+plt.imshow(alice_mask, cmap=plt.cm.gray, interpolation='bilinear')
+plt.axis("off")
 plt.show()
