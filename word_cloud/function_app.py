@@ -30,13 +30,13 @@ def http_word_cloud(req: func.HttpRequest) -> func.HttpResponse:
         
         text = text_file.read().decode("utf-8")
         d = os.path.dirname(__file__) if "__file__" in locals() else os.getcwd()
-        alice_mask = np.array(Image.open(os.path.join(d, "logo.png")))
+        logo_mask = np.array(Image.open(os.path.join(d, "logo.png")))
 
         stopwords = set(STOPWORDS)
         stopwords.add("said")
 
         wc = WordCloud(
-            background_color="white", max_words=2000, mask=alice_mask,
+            background_color="white", max_words=2000, mask=logo_mask,
             stopwords=stopwords, contour_width=1, contour_color='steelblue',
             colormap='winter', height=300, width=100
         )

@@ -1,1 +1,6 @@
+# Python virtual environments
 .venv
+
+# Azure function project settings & generated files
+.vscode/
+_*
