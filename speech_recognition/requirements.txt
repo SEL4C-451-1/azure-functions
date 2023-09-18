@@ -1,14 +1,8 @@
-certifi==2023.7.22
-charset-normalizer==3.2.0
-decorator==4.4.2
-idna==3.4
-imageio==2.31.3
-imageio-ffmpeg==0.4.8
+# DO NOT include azure-functions-worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+azure-functions
 moviepy==1.0.3
-numpy==1.25.2
-Pillow==10.0.0
-proglog==0.1.10
-requests==2.31.0
-SpeechRecognition==3.10.0
-tqdm==4.66.1
-urllib3==2.0.4
+speechrecognition==3.10.0
+psycopg2-binary==2.9.7
