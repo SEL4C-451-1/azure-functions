@@ -20,7 +20,7 @@ def http_word_cloud(req: func.HttpRequest) -> func.HttpResponse:
     if not text_file:
         return func.HttpResponse(
              "This HTTP triggered function executed successfully. Pass a text file to execute functionality.",
-             status_code=200
+             status_code=400
         )
     
 

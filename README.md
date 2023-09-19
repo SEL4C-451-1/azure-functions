@@ -2,6 +2,22 @@
 
 ## Running it
 
+### Speech Recognition
+
+<details close>
+<summary>Expand</summary>
+To run the speech recognition function you can do it locally using VS Code or deploy it to Azure.
+- I do recommend to already have a Postgres database running on Azure with all requirements set up (see below).
+
+Then execute a web request to the function endpoint using the [make_request.py](tools/make_request.py) script:
+- The use of the script requires the installation of the requests python package.
+- The usage of the script is due to unexpected encoding using powershell. :exclamation: Tests with curl and swift are pending. :exclamation:
+:exclamation: :exclamation: :exclamation: Be sure to modify the function_url and file_path according to your environment. :exclamation: :exclamation: :exclamation:
+
+:exclamation: :exclamation: :exclamation: As for now, the function takes around 18 seconds to process a request with a similar video input such as the sample provided, further testing is required. :exclamation: :exclamation: :exclamation:
+
+</details>
+
 ### Word Cloud
 
 <details close>
@@ -51,17 +67,15 @@ This is an example output
 
 ## Deploying to Azure
 
-### Word Cloud
-
 <details close>
 <summary>Expand</summary>
-To deploy the word cloud function to Azure I recommend using VS Code.
+To deploy the any of the functions to Azure I recommend using VS Code.
 
-:exclamation: Be sure to already haev the postgresql database deployed and to modify the connection string according to your environment. _function_app.py Line 30_ :exclamation:
+:exclamation: Be sure to already haev the postgresql database deployed and to modify the connection string according to your environment. _cnx = psycopg2.connect(user="your_user_name", password="password", host="your_azure_postgresql_host", port=5432, database="database_name")_ :exclamation:
 
-1. Install the Azure Tools extension for VS Code; Azurite (Azure Storage Emulator) extension is recommende; [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local); [PostgreSQL](https://www.postgresql.org/download/) isn't required but recommended for connecting to the DB through pgAdmin.
+1. Install the Azure Tools extension for VS Code; Azurite (Azure Storage Emulator) extension is recommended; [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local); [PostgreSQL](https://www.postgresql.org/download/) isn't required but recommended for connecting to the DB through pgAdmin.
 2. Sign in to Azure using the Azure: Sign In command.
-3. Create a new foler on root to contain the function app.
+3. Create a new folder on root to contain the function app.
 4. Create a virtual environment in the folder you just created.
 ``` python
 python -m venv .venv
@@ -93,21 +107,67 @@ python -m venv .venv
 
 <details close>
 <summary>Expand</summary>
-A Postgres database running on Azure. With a db named **sel4c**, a table named 'word_cloud_images' with two columns: 'id' (integer, serial) and 'image' (bytea).
-- Create another user than admin to keep security tight. Then add the required permissions to the user such as SELECT and INSERT on the wordcloud table.
+A Postgres database running on Azure. With a db named **sel4c**, a table named 'word_cloud_images' with two columns: 'id' (integer, serial) and 'image' (bytea) &  a table named 'word_cloud_text' with two columns: 'id' (integer, serial) and 'text' (bytea).
+- Create another user than admin to keep security tight. Then add the required permissions to the user such as SELECT, INSERT and UPDATE on the tables.
 
 ```SQL
--- Create the wordcloud table
+-- Create the wordcloud_images table
 CREATE TABLE word_cloud_images (
     id SERIAL PRIMARY KEY,
     image_data BYTEA
 );
+-- Create the wordcloud_text table
+CREATE TABLE word_cloud_text (
+    id SERIAL PRIMARY KEY,
+    text_data BYTEA
+);
 -- Grant SELECT & INSERT permission on the tables word_cloud_image & word_cloud_text to your_user_name
-GRANT SELECT, INSERT, UPDATE ON word_cloud_images TO your_user_name;
-GRANT SELECT, INSERT, UPDATE ON word_cloud_text TO your_user_name;
+GRANT SELECT, INSERT, UPDATE ON TABLE word_cloud_images TO your_user_name;
+GRANT SELECT, INSERT, UPDATE ON TABLE word_cloud_text TO your_user_name;
+COMMIT;
+```
+
+- In case you got some error such as _Permission denied for sequence... You can grant the required permissions to the user as follows:
+
+```SQL
+GRANT USAGE, SELECT ON SEQUENCE word_cloud_images_id_seq TO your_user;
+GRANT USAGE, SELECT ON SEQUENCE word_cloud_text_id_seq TO your_user;
 COMMIT;
 ```
 
 Be sure to check the network settings of your database to allow access from the Azure Function App. You can do this by adding the IP of the Function App to the firewall rules of the database or the option "Allow public access from any Azure service within Azure to this server".
 
 :exclamation: :exclamation: :exclamation: Both functions are developed for azure functions python v2 :exclamation: :exclamation: :exclamation:
+
+</details>
+
+### Speech Recognition
+
+<details close>
+<summary>Expand</summary>
+A Postgres database running on Azure. With a db named **sel4c**, a table named 'speech_recognition_text' with two columns: 'id' (integer, serial) and 'text_transcript' (text).
+- Create another user than admin to keep security tight. Then add the required permissions to the user such as SELECT and INSERT on the table.
+
+```SQL
+-- Create the speech_recognition_text table
+CREATE TABLE speech_recognition_text (
+    id SERIAL PRIMARY KEY,
+    text_transcript TEXT
+);
+-- Grant SELECT & INSERT permission on table speech_recognition_text to your_user_name
+GRANT SELECT, INSERT, UPDATE ON TABLE speech_recognition_text TO your_user_name;
+COMMIT;
+```
+
+- In case you got some error such as _Permission denied for sequence... You can grant the required permissions to the user as follows:
+
+```SQL
+GRANT USAGE, SELECT ON SEQUENCE speech_recognition_text_id_seq TO your_user;
+COMMIT;
+```
+
+Be sure to check the network settings of your database to allow access from the Azure Function App. You can do this by adding the IP of the Function App to the firewall rules of the database or the option "Allow public access from any Azure service within Azure to this server".
+
+:exclamation: :exclamation: :exclamation: Both functions are developed for azure functions python v2 :exclamation: :exclamation: :exclamation:
+
+</details>
