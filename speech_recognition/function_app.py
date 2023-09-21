@@ -3,7 +3,6 @@ import logging
 import psycopg2
 from psycopg2 import sql
 import speech_recognition as sr
-import mimetypes
 from tempfile import NamedTemporaryFile
 import moviepy.editor as mp
 
