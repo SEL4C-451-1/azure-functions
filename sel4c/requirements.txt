@@ -4,4 +4,5 @@
 
 azure-functions
 wordcloud==1.9.2
-psycopg2-binary==2.9.7
+moviepy==1.0.3
+speechrecognition==3.10.0
