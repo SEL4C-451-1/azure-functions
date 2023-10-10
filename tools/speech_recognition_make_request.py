@@ -2,7 +2,7 @@ import requests
 import json
 
 # URL of your Azure Function or local deployment
-function_url = "https://http-word-cloud.azurewebsites.net/api/speech_recognition?code=_FB1pPcUH0r-p5qzzC99JyiK1BRfMhJci2yL4wVw-azwAzFuhcv83w=="
+function_url = "http://localhost:7071/api/speech_recognition"
 
 # Path to the audio or video file you want to send
 file_path = "../samples/text.mp4"
